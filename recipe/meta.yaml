@@ -1,17 +1,18 @@
 {% set name = "uncalled-for" %}
-{% set version = "0.3.2" %}
+{% set version = "0.4.1" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz
-  sha256: 89f5dbcd71e2b8f47c030b1fa302e6cce2ec795d1ac565eeb6525c5fe55cb8a2
+  sha256: 6412b19d1b1e7d431981fee01f8b47be7802f48328a48cbe9603acee757ec553
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [py<310]
 
 requirements:
   host:
@@ -23,12 +24,17 @@ requirements:
     - python
 
 test:
-  requires:
-    - pip
-  commands:
-    - pip check
+  source_files:
+    - tests
   imports:
     - uncalled_for
+  requires:
+    - pip
+    - pytest
+    - pytest-asyncio
+  commands:
+    - pip check
+    - pytest -vv tests -o asyncio_mode=auto
 
 about:
   home: https://github.com/chrisguidry/uncalled-for
